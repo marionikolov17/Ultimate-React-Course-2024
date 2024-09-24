@@ -1,10 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client'
-import App from './App';
-import './index.css'
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+/* eslint-disable react/prop-types */
+export default function Main({ children }) {
+    return (
+        <>
+            <main className="main">
+                {children}
+            </main>
+        </>
+    )
+}
