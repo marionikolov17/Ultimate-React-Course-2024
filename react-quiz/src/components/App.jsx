@@ -17,7 +17,7 @@ const initialState = {
   index: 0,
   answer: null,
   points: 0,
-  highscore: 0
+  highscore: 0,
 };
 
 function reducer(state, action) {
@@ -60,18 +60,24 @@ function reducer(state, action) {
       return {
         ...state,
         status: "finished",
-        highscore: state.points > state.highscore ? state.points : state.highscore
-      }
+        highscore:
+          state.points > state.highscore ? state.points : state.highscore,
+      };
+    case "restart":
+      return {
+        ...initialState,
+        questions: state.questions,
+        highscore: state.highscore,
+        status: "ready"
+      };
     default:
       throw new Error("Action is unknown");
   }
 }
 
 export default function App() {
-  const [{ questions, status, index, answer, points, highscore }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [{ questions, status, index, answer, points, highscore }, dispatch] =
+    useReducer(reducer, initialState);
 
   const numQuestions = questions.length;
   const maxPossiblePoints = questions.reduce((a, b) => a + b.points, 0);
@@ -112,10 +118,22 @@ export default function App() {
                 dispatch={dispatch}
                 answer={answer}
               />
-              <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions} />
+              <NextButton
+                dispatch={dispatch}
+                answer={answer}
+                index={index}
+                numQuestions={numQuestions}
+              />
             </>
           )}
-          {status === "finished" && <FinishedScreen points={points} maxPossiblePoints={maxPossiblePoints} highscore={highscore}/>}
+          {status === "finished" && (
+            <FinishedScreen
+              points={points}
+              maxPossiblePoints={maxPossiblePoints}
+              highscore={highscore}
+              dispatch={dispatch}
+            />
+          )}
         </Main>
       </div>
     </>
