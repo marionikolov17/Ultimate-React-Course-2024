@@ -11,7 +11,9 @@ const initialState = {
 
   // "loading", "error", "ready", "active", "finished"
   status: "loading",
-  index: 0
+  index: 0,
+  answer: null,
+  points: 0
 };
 
 function reducer(state, action) {
@@ -27,18 +29,30 @@ function reducer(state, action) {
         ...state,
         status: "error",
       };
-    case "start": 
+    case "start":
       return {
         ...state,
-        status: "active"
-      }
+        status: "active",
+      };
+    case "newAnswer":
+      // eslint-disable-next-line no-case-declarations
+      const question = state.questions.at(state.index);
+
+      return {
+        ...state,
+        answer: action.payload,
+        points: action.payload === question.correctOption ? state.points + question.points : state.points
+      };
     default:
       throw new Error("Action is unknown");
   }
 }
 
 export default function App() {
-  const [{ questions, status, index }, dispatch] = useReducer(reducer, initialState);
+  const [{ questions, status, index, answer, points }, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   const numQuestions = questions.length;
 
@@ -61,8 +75,10 @@ export default function App() {
         <Main>
           {status === "loading" && <Loader />}
           {status === "error" && <Error />}
-          {status === "ready" && <StartScreen dispatch={dispatch} numQuestions={numQuestions} />}
-          {status === "active" && <Question question={questions[index]}/>}
+          {status === "ready" && (
+            <StartScreen dispatch={dispatch} numQuestions={numQuestions} />
+          )}
+          {status === "active" && <Question question={questions[index]} dispatch={dispatch} answer={answer}/>}
         </Main>
       </div>
     </>
