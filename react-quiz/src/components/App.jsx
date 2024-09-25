@@ -6,6 +6,7 @@ import Error from "./Error";
 import StartScreen from "./StartScreen";
 import Question from "./Question";
 import NextButton from "./NextButton";
+import Progress from "./Progress";
 
 const initialState = {
   questions: [],
@@ -14,7 +15,7 @@ const initialState = {
   status: "loading",
   index: 0,
   answer: null,
-  points: 0
+  points: 0,
 };
 
 function reducer(state, action) {
@@ -42,14 +43,17 @@ function reducer(state, action) {
       return {
         ...state,
         answer: action.payload,
-        points: action.payload === question.correctOption ? state.points + question.points : state.points
+        points:
+          action.payload === question.correctOption
+            ? state.points + question.points
+            : state.points,
       };
     case "nextQuestion":
       return {
         ...state,
         answer: null,
-        index: state.index + 1
-      }
+        index: state.index + 1,
+      };
     default:
       throw new Error("Action is unknown");
   }
@@ -62,6 +66,7 @@ export default function App() {
   );
 
   const numQuestions = questions.length;
+  const maxPossiblePoints = questions.reduce((a, b) => a + b.points, 0);
 
   useEffect(() => {
     fetch("http://localhost:8000/questions")
@@ -85,12 +90,23 @@ export default function App() {
           {status === "ready" && (
             <StartScreen dispatch={dispatch} numQuestions={numQuestions} />
           )}
-          {status === "active" && 
-          <>
-            <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
-            <NextButton dispatch={dispatch} answer={answer} />
-          </>
-          }
+          {status === "active" && (
+            <>
+              <Progress
+                index={index}
+                numQuestions={numQuestions}
+                points={points}
+                maxPossiblePoints={maxPossiblePoints}
+                answer={answer}
+              />
+              <Question
+                question={questions[index]}
+                dispatch={dispatch}
+                answer={answer}
+              />
+              <NextButton dispatch={dispatch} answer={answer} />
+            </>
+          )}
         </Main>
       </div>
     </>
