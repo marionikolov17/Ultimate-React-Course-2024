@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
-import { Form, redirect } from "react-router-dom";
+import { Form, redirect, useActionData } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 
 // https://uibakery.io/regex-library/phone-number
@@ -37,6 +37,8 @@ function CreateOrder() {
   // const [withPriority, setWithPriority] = useState(false);
   const cart = fakeCart;
 
+  const formErrors = useActionData();
+
   return (
     <div>
       <h2>Ready to order? Let's go!</h2>
@@ -52,6 +54,7 @@ function CreateOrder() {
           <div>
             <input type="tel" name="phone" required />
           </div>
+          {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
 
         <div>
@@ -91,6 +94,12 @@ export async function action({ request }) {
     cart: JSON.parse(data.cart),
     priority: data.priority === "on"
   };
+
+  const errors = {};
+
+  if (!isValidPhone(order.phone)) errors.phone = "Please specify valid phone number. We might need to contact you";
+
+  if (Object.keys(errors).length > 0) return errors;
 
   const newOrder = await createOrder(order);
 
