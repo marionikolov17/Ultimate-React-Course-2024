@@ -1,5 +1,5 @@
-export default function Home() {
+export default function Page() {
   return (
-   <h1>Hello World</h1>
+   <h1>The Wild Oasis. Welcome to paradise.</h1>
   );
 }
